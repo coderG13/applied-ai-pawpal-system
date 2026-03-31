@@ -4,24 +4,17 @@
 
 ### a. Initial design
 
-My initial design had four main classes: `Owner`, `Pet`, `Task`, and `Scheduler`. The idea was to model real life as closely as possible without over-complicating things.
+I started with four classes: `Owner`, `Pet`, `Task`, and `Scheduler`. I wanted to keep it close to real life — an owner has pets, each pet has tasks, and the scheduler figures out what to do today. Each `Task` needed a duration, a priority, and an optional preferred time so the scheduler could sort them properly.
 
-- **Owner** holds the owner's name and their daily time budget (`available_minutes`), plus a list of pets.
-- **Pet** holds a pet's profile (name, species, age, breed, medical notes) and a list of tasks.
-- **Task** represents one care activity. From the start I knew each task needed a duration, a priority level, and an optional preferred time so the scheduler could order them.
-- **Scheduler** was responsible for building the daily plan given the owner's constraints.
-
-I did not plan a `ScheduledTask` class at first — I originally thought the scheduler could just return a list of tasks directly.
+I didn't plan a `ScheduledTask` class at first. I thought the scheduler could just return the tasks directly.
 
 ### b. Design changes
 
-Two changes happened during implementation:
+A few things changed once I actually started building:
 
-1. **Added `ScheduledTask`** — When I started writing `build_daily_schedule`, I realized I needed to store more than just the task itself: I needed the calculated `start_time`, `end_time`, pet reference, and a reason string. Creating a separate `ScheduledTask` dataclass made the output much cleaner and easier to display in the Streamlit table.
-
-2. **Stored the `Pet` object in `ScheduledTask` instead of just the pet's name** — Early on I stored `pet_name: str`. During UI wiring I needed to display the pet's name alongside the task. Storing the full `Pet` object made that access straightforward without any extra lookup.
-
-3. **Added `clear_schedule()` as an explicit step** — The first version of `build_daily_schedule` did not clear previous results, which caused tasks to double up when the button was pressed more than once. Adding an explicit `clear_schedule()` call at the start of `build_daily_schedule` fixed this.
+- **Added `ScheduledTask`** — when I started writing `build_daily_schedule`, I realized returning just a list of tasks wasn't enough. I needed to store the calculated start/end times and a reason for each one. A separate class made the output way cleaner to display in Streamlit.
+- **Stored the full `Pet` object instead of just the name** — I originally had `pet_name: str` in `ScheduledTask`, but when I connected it to the UI I needed to show the pet's name next to each task. Storing the actual `Pet` object made that easy without any extra lookup.
+- **Added `clear_schedule()`** — I noticed tasks were doubling up every time the schedule button was pressed. Calling `clear_schedule()` at the start of `build_daily_schedule` fixed it.
 
 ---
 
@@ -29,19 +22,19 @@ Two changes happened during implementation:
 
 ### a. Constraints and priorities
 
-The scheduler respects two hard constraints and one soft hint:
+My scheduler uses three things to decide what gets scheduled:
 
-- **Hard constraint — time budget:** A task is only added to the schedule if `used_minutes + task.duration_minutes <= owner.available_minutes`. Tasks that would exceed the budget are silently skipped.
-- **Hard constraint — task completion:** Only incomplete tasks (`task.completed == False`) are considered. Completed tasks are excluded by `collect_tasks()`.
-- **Soft hint — preferred time:** The preferred time is used for sorting, not enforcement. A task with `preferred_time="09:00"` will appear before one set to `10:00`, but the scheduler does not guarantee it actually starts at that time — it starts as soon as the previous task ends.
+- **Time budget** — a task only gets added if the total time used so far plus its duration doesn't go over `available_minutes`. If it doesn't fit, it gets skipped.
+- **Completion status** — `collect_tasks()` only picks up incomplete tasks, so already-done tasks are ignored.
+- **Preferred time** — this is used for sorting, not strict enforcement. A task set for `09:00` will come before one set for `10:00`, but it might not actually start at exactly that time depending on what came before it.
 
-Priority is the primary sort key. Within the same priority level, earlier preferred times break the tie.
+Priority is the main sort key. If two tasks have the same priority, earlier preferred time wins.
 
 ### b. Tradeoffs
 
-**Greedy ordering, no rescheduling:** Once the sorted list is built, the scheduler walks it in order and adds each task as long as it fits. It never backtracks to try a different combination that might fit more tasks. This means a single long high-priority task can push out several shorter lower-priority ones even if rearranging them would have fit everything. For a basic pet-care app, this tradeoff is acceptable — the owner gets the most important tasks first, which is the main goal.
+The scheduler goes through the sorted list in order and adds tasks as long as they fit — it doesn't go back and try rearranging things to squeeze in more. So a single long high-priority task could push out a few shorter lower-priority ones. That felt like a fair tradeoff for this project since the goal is to get the most important stuff done first.
 
-**Exact-time conflict detection:** `conflicts_with()` returns `True` only when two tasks share the exact same `preferred_time` string. It does not check whether time ranges overlap. For example, a 60-minute task at `08:00` and a 10-minute task at `08:30` would not be flagged even though they overlap in reality. This keeps the conflict logic simple, which was the right call for this scope.
+For conflict detection, I only flag tasks that share the exact same preferred time string. It won't catch overlapping time ranges (like a 60-minute task at 08:00 and a 10-minute task at 08:30). It's not perfect but it's simple and handles the obvious cases.
 
 ---
 
@@ -49,23 +42,18 @@ Priority is the primary sort key. Within the same priority level, earlier prefer
 
 ### a. How I used AI
 
-I used two AI tools at different points:
+I used Copilot and Claude at different points. Copilot was helpful while writing code — it filled in list comprehensions and repetitive patterns quickly, and I accepted those suggestions when they matched what I was going for. Claude was more useful for design questions, like whether `ScheduledTask` should be its own class and where `scheduled_tasks` should live.
 
-- **GitHub Copilot** was open in the editor while I wrote code. It was most useful for filling in repetitive boilerplate — for example, completing the list comprehensions inside `remove_task` and `remove_pet`, and generating the `__str__`-style output in `explain_schedule`. I accepted those suggestions when they matched exactly what I had in mind.
+I wrote the tests myself after the logic was done. I wanted to make sure I actually understood what each test was checking rather than just copying something that looked right.
 
-- **Claude** was useful for talking through design decisions before writing code. I used it to think through whether `ScheduledTask` should be its own class and whether `Scheduler` should own the `scheduled_tasks` list or return a fresh one each time.
+### b. What I accepted and rejected
 
-I kept AI tools more separate from the tests — I wrote those manually after the logic was working, so I could be sure I understood what each test was actually checking.
+A couple of times I pushed back on AI suggestions:
 
-### b. Judgment and verification
+- **Rejected a fancier conflict check** — AI suggested replacing the simple time-string comparison with a full datetime range overlap calculation. The logic was correct but it made the method much longer and harder to test. The simple version does the job for this project, so I kept it.
+- **Rejected adding a priority field to `Pet`** — the idea was that some pets could have higher overall priority than others. I decided against it because task-level priorities already handle this. A high-priority feeding task for any pet will naturally rank above a low-priority grooming task. Adding pet-level priority would've made the sort logic harder for no real gain.
 
-Two cases where I did not accept a suggestion as-is:
-
-1. **Rejected a more complex conflict check.** An AI suggestion replaced the simple `preferred_time == other.preferred_time` check with a full time-range overlap calculation using `datetime` objects. The logic was correct, but it made `conflicts_with` significantly longer and introduced a dependency on string parsing that could fail on unexpected input. I kept the simpler exact-match version because it was enough for this project's requirements and much easier to test.
-
-2. **Rejected a suggestion to add a `priority` attribute directly on `Pet`.** The idea was that a pet's overall priority would influence scheduling. I decided against it because task-level priorities already capture this — a pet's high-priority feeding task will naturally rank above another pet's low-priority grooming task without needing a separate pet-level weight. Adding it would have made the sort logic more complex without a clear benefit.
-
-For verification, I ran the affected functions manually with small examples in a Python shell before writing the corresponding tests. If the output matched my expectation, I committed the implementation.
+I tested things manually in the Python shell before writing tests — if the output looked right, I moved forward.
 
 ---
 
@@ -73,25 +61,22 @@ For verification, I ran the affected functions manually with small examples in a
 
 ### a. What I tested
 
-| Test | Behavior covered |
-|------|-----------------|
-| `test_mark_complete_changes_status` | `mark_complete()` sets `completed` to `True` |
-| `test_add_task_to_pet` | `pet.add_task()` appends correctly and is retrievable by index |
-| `test_sort_by_time_returns_chronological_order` | `sort_by_time` puts 08:00 before 08:30 before 09:00 regardless of insertion order |
-| `test_daily_task_completion_creates_next_recurring_task` | Completing a `daily` task marks it done and creates a new task with `due_date + 1 day`; the pet ends up with 2 tasks |
-| `test_conflict_detection_flags_duplicate_times` | Two tasks at `08:30` produce exactly one conflict string containing that time |
-| `test_pet_with_no_tasks_returns_empty_list` | `collect_tasks()` returns `[]` when no tasks exist |
+| Test | What it checks |
+|------|---------------|
+| `test_mark_complete_changes_status` | `mark_complete()` actually sets `completed` to `True` |
+| `test_add_task_to_pet` | Tasks added to a pet are saved correctly |
+| `test_sort_by_time_returns_chronological_order` | Tasks sort by time no matter what order they were added |
+| `test_daily_task_completion_creates_next_recurring_task` | Completing a daily task marks it done and creates tomorrow's copy |
+| `test_conflict_detection_flags_duplicate_times` | Two tasks at the same time produce exactly one warning |
+| `test_pet_with_no_tasks_returns_empty_list` | An empty pet gives back an empty task list |
 
-I focused on the behaviors most likely to break quietly — sorting order, recurring task creation, and conflict detection — because those are harder to spot visually in the UI.
+I focused on the things most likely to break without being obvious in the UI — sorting, recurring tasks, and conflict detection.
 
-### b. Confidence and next steps
+### b. How confident am I
 
-I am confident the core behaviors work correctly because each test directly checks a specific outcome rather than just checking that nothing crashes. The recurring task test, for example, checks both the completion status of the original task and the exact `due_date` of the new one.
+Pretty confident in the core stuff. Each test checks a real outcome, not just that nothing crashed. The recurring task test, for example, checks that the original is marked done *and* that the new one has the right due date.
 
-If I had more time, I would add tests for:
-- The `available_minutes` budget cutoff — verifying that a task which would exceed the budget is not added to `scheduled_tasks`
-- `filter_tasks` with combined pet name and completion filters
-- `create_next_recurring_task` for `weekly` frequency
+If I had more time I'd add tests for the time budget cutoff (making sure tasks that don't fit are actually excluded) and for `filter_tasks` with multiple filters at once.
 
 ---
 
@@ -99,12 +84,12 @@ If I had more time, I would add tests for:
 
 ### a. What went well
 
-Keeping `pawpal_system.py` completely independent of Streamlit was the best structural decision I made. Because all the logic is in plain Python dataclasses with no UI imports, I could test it directly with pytest and reason about it without needing to run the browser app. Connecting it to `app.py` afterward was straightforward.
+Keeping all the logic in `pawpal_system.py` separate from Streamlit was probably the best decision I made. I could run tests and debug everything without touching the UI, and hooking it up to `app.py` at the end was straightforward.
 
-### b. What I would improve
+### b. What I'd improve
 
-The scheduling algorithm skips tasks that exceed the budget but gives the user no feedback about which tasks were left out or why. I would add a `skipped_tasks` list to `build_daily_schedule` so the UI can show a "Not scheduled today" section with the reason (e.g., "not enough time remaining"). I would also make the conflict check time-range aware, since the current version can miss real overlaps.
+The scheduler silently skips tasks that don't fit, which isn't great UX. I'd add a "not scheduled" section to the UI so the owner knows what got left out and why. I'd also improve conflict detection to catch overlapping time ranges, not just exact matches.
 
 ### c. Key takeaway
 
-The most valuable thing I learned is that AI tools work best as a sounding board during design, not as a replacement for thinking through the design yourself. When I accepted an AI suggestion without reading it carefully, I sometimes had to undo it later because it didn't match my data model. When I described the problem clearly and then evaluated the suggestion against my own understanding, the collaboration went much faster and the result was code I actually understood.
+AI tools are genuinely useful but you have to stay in the driver's seat. A few times I accepted a suggestion without thinking it through and had to undo it later. When I described what I wanted clearly and then checked whether the suggestion actually made sense for my design, it went a lot smoother. The code is better when I use AI to think things through rather than just to write things for me.
