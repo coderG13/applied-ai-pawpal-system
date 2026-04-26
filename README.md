@@ -26,8 +26,20 @@ This version enhances PawPal+ with AI capabilities:
 
 - Retrieval-Augmented reasoning (RAG) using a pet-care knowledge base  
 - AI-generated suggestions and safety warnings  
-- Improved decision-making with explainable outputs  
-- Integration of AI directly into the scheduling workflow  
+- Agentic reasoning workflow with observable steps  
+- Reliability evaluation through a testing script with confidence scoring  
+
+---
+
+## 🧠 Core AI Feature
+
+The main AI feature combines:
+
+- **Retrieval-Augmented Generation (RAG):** loads multiple knowledge files (`pet_care.txt`, `safety_rules.txt`)  
+- **Agentic Workflow:** structured reasoning process with observable steps  
+- **Reliability Evaluation:** test harness that validates system behavior  
+
+This feature is fully integrated into the system. Every generated schedule is automatically analyzed by the AI engine, which applies rules and produces suggestions that directly affect output behavior.
 
 ---
 
@@ -40,16 +52,16 @@ The system is composed of:
 
 - **Streamlit UI (`app.py`)** → handles user input and output  
 - **Scheduler (`pawpal_system.py`)** → generates the base schedule  
-- **AI Engine (`ai/ai_engine.py`)** → analyzes the schedule and generates suggestions  
-- **Knowledge Base (`ai/knowledge/`)** → provides pet-care rules  
-- **Evaluation Script (`evaluate_ai.py`)** → tests system reliability  
+- **AI Engine (`ai/ai_engine.py`)** → analyzes schedules and generates suggestions  
+- **Knowledge Base (`ai/knowledge/`)** → stores pet-care rules  
+- **Evaluation Script (`evaluate_ai.py`)** → tests reliability  
 
 ### Data Flow
 User Input → Scheduler → AI Analysis → Suggestions → Final Output  
 
 ### Human + Testing Role
 - The user reviews AI suggestions before acting  
-- Testing ensures outputs are consistent and safe  
+- Evaluation script verifies correctness and consistency  
 
 ---
 
