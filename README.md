@@ -3,6 +3,8 @@
 ## 📌 Project Summary
 PawPal AI Care Assistant is an intelligent pet-care scheduling system that helps pet owners organize daily tasks while ensuring safety and efficiency. It extends a rule-based scheduler by integrating AI-driven reasoning and retrieval to provide smart suggestions and warnings. This system improves decision-making by combining structured scheduling with AI insights based on real pet-care guidelines.
 
+## 🎥 Demo Vido
+[Loom Demo](https://www.loom.com/share/4cd170c264004d85b47e09d1710857db)
 ---
 
 ## 🔙 Original Project (Module 2)
