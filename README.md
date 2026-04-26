@@ -1,10 +1,18 @@
 # 🐾 PawPal AI Care Assistant
 
+## 🎥 Demo Video
+▶️ [Watch Full Demo](https://www.loom.com/share/4cd170c264004d85b47e09d1710857db)
+
+---
+
 ## 📌 Project Summary
 PawPal AI Care Assistant is an intelligent pet-care scheduling system that helps pet owners organize daily tasks while ensuring safety and efficiency. It extends a rule-based scheduler by integrating AI-driven reasoning and retrieval to provide smart suggestions and warnings. This system improves decision-making by combining structured scheduling with AI insights based on real pet-care guidelines.
 
-## 🎥 Demo Vido
-[Loom Demo](https://www.loom.com/share/4cd170c264004d85b47e09d1710857db)
+---
+
+## 🔗 Project Repository
+GitHub: https://github.com/coderG13/applied-ai-pawpal-system
+
 ---
 
 ## 🔙 Original Project (Module 2)
@@ -55,4 +63,4 @@ python3 -m venv .venv
 source .venv/bin/activate
 
 pip install -r requirements.txt
-streamlit run app.py
+python3 -m streamlit run app.py
