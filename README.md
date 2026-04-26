@@ -32,7 +32,7 @@ The system is composed of:
 - **Scheduler (`pawpal_system.py`)** → generates the base schedule  
 - **AI Engine (`ai/ai_engine.py`)** → analyzes the schedule and generates suggestions  
 - **Knowledge Base (`ai/knowledge/pet_care.txt`)** → provides pet-care rules  
-- **Testing/Evaluation** → ensures reliability  
+- **Testing/Evaluation (`evaluate_ai.py`)** → ensures reliability  
 
 ### Data Flow
 User Input → Scheduler → AI Analysis → Suggestions → Final Output  
@@ -43,29 +43,13 @@ User Input → Scheduler → AI Analysis → Suggestions → Final Output
 
 ---
 
-## Reliability and Evaluation
-
-To verify that the AI system works correctly, I implemented an evaluation script (`evaluate_ai.py`) that tests the system on predefined scenarios.
-
-### Results
-- 3 out of 3 tests passed
-- The AI correctly identified unsafe scheduling patterns such as:
-  - Walking immediately after feeding
-  - Closely spaced medication tasks
-- The AI avoided producing unnecessary warnings for safe schedules
-
-### Conclusion
-The system behaved reliably on the tested examples. While the AI is rule-based, it consistently produces correct and explainable outputs. Future improvements could include more advanced reasoning and additional validation rules.
-
----
-
 ## ⚙️ Setup Instructions
 
 ```bash
 git clone https://github.com/coderG13/applied-ai-pawpal-system.git
 cd applied-ai-pawpal-system
 
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 
 pip install -r requirements.txt
