@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import date
+from ai.ai_engine import analyze_schedule
 from pawpal_system import Owner, Pet, Task, Scheduler
 
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
@@ -180,6 +181,7 @@ if st.session_state.owner.pets:
     )
 
     selected_pet_name = None if filter_pet == "All" else filter_pet
+
     selected_completed = None
     if filter_status == "Completed":
         selected_completed = True
@@ -214,9 +216,17 @@ st.subheader("Build Daily Schedule")
 
 if st.button("Generate Schedule"):
     schedule = scheduler.build_daily_schedule(start_time="08:00")
+    suggestions = analyze_schedule(schedule)
 
     if schedule:
         st.success("Schedule generated successfully.")
+
+        if suggestions:
+            st.subheader("🤖 AI Suggestions")
+            for suggestion in suggestions:
+                st.warning(suggestion)
+        else:
+            st.info("No AI suggestions needed. The schedule looks safe based on the current knowledge rules.")
 
         schedule_table = []
         for item in schedule:
@@ -234,5 +244,6 @@ if st.button("Generate Schedule"):
         st.markdown("### Why these tasks were chosen")
         for explanation in scheduler.explain_schedule():
             st.write(f"- {explanation}")
+
     else:
         st.warning("No tasks could be scheduled.")

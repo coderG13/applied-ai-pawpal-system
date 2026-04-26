@@ -1,0 +1,47 @@
+<svg width="1100" height="760" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .box { fill:#f8fafc; stroke:#334155; stroke-width:2; rx:14; }
+    .ai { fill:#ecfeff; stroke:#0891b2; stroke-width:2; rx:14; }
+    .human { fill:#fff7ed; stroke:#ea580c; stroke-width:2; rx:14; }
+    .test { fill:#f0fdf4; stroke:#16a34a; stroke-width:2; rx:14; }
+    .text { font-family: Arial, sans-serif; font-size:18px; fill:#0f172a; font-weight:bold; }
+    .small { font-family: Arial, sans-serif; font-size:14px; fill:#334155; }
+    .arrow { stroke:#475569; stroke-width:2.5; marker-end:url(#arrowhead); fill:none; }
+  </style>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <text x="360" y="40" class="text" style="font-size:28px;">PawPal AI Care Assistant Architecture</text>
+
+  <rect x="430" y="80" width="250" height="80" class="human"/>
+  <text x="485" y="115" class="text">User / Pet Owner</text>
+
+  <rect x="390" y="210" width="330" height="90" class="box"/>
+  <text x="485" y="245" class="text">Streamlit UI</text>
+
+  <rect x="390" y="350" width="330" height="90" class="box"/>
+  <text x="450" y="385" class="text">Core Scheduler</text>
+
+  <rect x="90" y="500" width="300" height="95" class="ai"/>
+  <text x="180" y="535" class="text">Knowledge Base</text>
+
+  <rect x="430" y="500" width="300" height="95" class="ai"/>
+  <text x="525" y="535" class="text">AI Engine</text>
+
+  <rect x="780" y="500" width="280" height="95" class="test"/>
+  <text x="865" y="535" class="text">Evaluator / Tests</text>
+
+  <rect x="390" y="650" width="340" height="80" class="human"/>
+  <text x="455" y="685" class="text">Final Output</text>
+
+  <line x1="555" y1="160" x2="555" y2="210" class="arrow"/>
+  <line x1="555" y1="300" x2="555" y2="350" class="arrow"/>
+  <line x1="555" y1="440" x2="555" y2="500" class="arrow"/>
+  <line x1="390" y1="548" x2="430" y2="548" class="arrow"/>
+  <line x1="730" y1="548" x2="780" y2="548" class="arrow"/>
+  <line x1="580" y1="595" x2="580" y2="650" class="arrow"/>
+</svg>
