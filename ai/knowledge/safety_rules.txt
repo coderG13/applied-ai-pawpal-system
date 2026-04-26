@@ -1,0 +1,4 @@
+Pet medication tasks should not be scheduled too close together.
+Owners should review medical-related suggestions before acting.
+Long activities should not be scheduled back-to-back without breaks.
+AI pet-care suggestions are advisory and should not replace veterinary advice.
