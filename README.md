@@ -6,7 +6,7 @@ PawPal AI Care Assistant is an intelligent pet-care scheduling system that helps
 ---
 
 ## 🔙 Original Project (Module 2)
-This project is an extension of my earlier project **PawPal+**, a Streamlit-based pet-care scheduler. The original system allowed users to add pets, assign tasks (feeding, walking, medication, etc.), and generate a daily schedule based on task priority and available time. It also included features like conflict detection and task filtering.
+This project is an extension of my earlier project **PawPal+**, a Streamlit-based pet-care scheduler. The original system allowed users to add pets, assign tasks (feeding, walking, medication, grooming, etc.), and generate a daily schedule based on task priority and available time. It also included features like conflict detection and task filtering.
 
 ---
 
@@ -31,8 +31,8 @@ The system is composed of:
 - **Streamlit UI (`app.py`)** → handles user input and output  
 - **Scheduler (`pawpal_system.py`)** → generates the base schedule  
 - **AI Engine (`ai/ai_engine.py`)** → analyzes the schedule and generates suggestions  
-- **Knowledge Base (`ai/knowledge/pet_care.txt`)** → provides pet-care rules  
-- **Testing/Evaluation (`evaluate_ai.py`)** → ensures reliability  
+- **Knowledge Base (`ai/knowledge/`)** → provides pet-care rules  
+- **Evaluation Script (`evaluate_ai.py`)** → tests system reliability  
 
 ### Data Flow
 User Input → Scheduler → AI Analysis → Suggestions → Final Output  
